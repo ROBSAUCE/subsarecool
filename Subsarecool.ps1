@@ -1,4 +1,4 @@
-﻿#obligitory ascii art
+#obligitory ascii art
 
 Write-Host -ForegroundColor Blue -BackgroundColor Black "
 
@@ -16,13 +16,14 @@ Super cool subdomain outputter thing!
 
 
 $subdomainfile =  read-host -Prompt "path to the subdomains file "
+$outfilename = Read-Host -Prompt "enter name of file EX: google.csv"
 $testifpathvalid = Test-Path -Type Leaf $subdomainfile
-$testifpathvalid2 = Test-Path -Type Leaf .\subsarecool.csv
+$testifpathvalid2 = Test-Path -Type Leaf .\$outfilename
 #remove csv if exists
 if ($testifpathvalid2 -eq $True){
 
 Write-Host -ForegroundColor Red "Removing current csv"
-Remove-Item .\subsarecool.csv
+Remove-Item .\$outfilename
 }
 else{write-host -ForegroundColor Green "No csv yet"
 }
@@ -39,10 +40,17 @@ Exit
 
 sleep 2
 
+$blankspace = "New Record"
+
 foreach($sub in $subs)
 {
   Write-Host -ForegroundColor Magenta "Working on "$sub.subs   
-  Resolve-DnsName -Type ALL -Name $sub.subs -ErrorAction SilentlyContinue |export-csv -Append -Path .\subsarecool.csv -Force -ErrorAction SilentlyContinue
+# $resolve = Resolve-DnsName -Type ALL -Name $sub.subs -ErrorAction SilentlyContinue 
+ #$hashtable.Add($sub , $resolve)
+ Resolve-DnsName -Type ALL -Name $sub.subs -ErrorAction SilentlyContinue |select Name,IP4Address,NameHost,QueryType,TTL,Section,NameExchange,Preference| export-csv -Append -Path .\$outfilename -Force -ErrorAction SilentlyContinue
+ echo $blankspace |Export-Csv -Path .\$outfilename -Append -Force
 }
+
+
 
 Write-Host -ForegroundColor Green - "file written to relative path .\subsarecool.csv"
